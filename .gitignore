@@ -1,0 +1,31 @@
+# web
+apps/web/node_modules
+apps/web/.next/
+apps/web/.env*
+apps/web/*.tsbuildinfo
+apps/web/next-env.d.ts
+
+# cms
+apps/cms/wp-content/
+apps/cms/wp-content/uploads/
+apps/cms/wp-content/languages/
+apps/cms/wp-content/advanced-cache.php
+apps/cms/wp-content/debug.log
+apps/cms/wp-content/debug.log.1
+apps/cms/wp-content/debug.log.2
+
+# infra
+infra/node_modules
+infra/test
+infra/package-lock.json
+infra/*.js
+infra/*.d.ts
+infra/node_modules
+infra/.cdk.staging
+infra/cdk.out
+
+# vercel
+.vercel
+
+# docker
+docker-compose.yml
