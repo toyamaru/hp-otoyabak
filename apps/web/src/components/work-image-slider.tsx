@@ -42,14 +42,14 @@ export function WorkImageSlider({ images, title }: WorkImageSliderProps) {
 
     return (
         <div className="space-y-4">
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-accent bg-background/40">
+            <div className="relative w-full min-h-72 h-[60vh] max-h-[80vh] overflow-hidden rounded-3xl border border-accent bg-background/40">
                 <Image
                     key={current.image.id ?? current.image.url}
                     src={current.image.url}
                     alt={current.image.alt || current.comment || `${title} image ${index + 1}`}
                     fill
                     sizes="(min-width: 768px) 50vw, 100vw"
-                    className="object-cover"
+                    className="object-contain"
                     priority={index === 0}
                 />
 
@@ -69,13 +69,13 @@ export function WorkImageSlider({ images, title }: WorkImageSliderProps) {
                 >
                     →
                 </button>
-
-                {current.comment && (
-                    <div className="absolute inset-x-0 bottom-0 bg-surface/80 px-4 py-3 text-sm text-foreground">
-                        {current.comment}
-                    </div>
-                )}
             </div>
+
+            {current.comment && (
+                <div className="rounded-2xl border border-accent/60 bg-surface/60 px-4 py-3 text-sm text-foreground">
+                    {current.comment}
+                </div>
+            )}
 
             <div className="flex items-center justify-center gap-2">
                 {validImages.map((item, dotIndex) => (
