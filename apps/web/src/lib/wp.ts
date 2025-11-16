@@ -137,8 +137,9 @@ const sanitizeString = (value: unknown): string | null => {
 const getOverview = (item: any): string | null => {
     const meta = item.meta ?? {};
     return (
-        sanitizeString(meta.work_overview) ??
-        sanitizeString(item.work_overview) ??
+        sanitizeString(item.overview) ?? // 新RESTトップレベル
+        sanitizeString(meta.work_overview) ?? // 互換
+        sanitizeString(item.excerpt?.rendered) ?? // 次善
         null
     );
 };
@@ -146,9 +147,9 @@ const getOverview = (item: any): string | null => {
 const getDetail = (item: any): string | null => {
     const meta = item.meta ?? {};
     return (
-        sanitizeString(meta.work_detail) ??
-        sanitizeString(item.work_detail) ??
-        sanitizeString(item.content?.rendered) ??
+        sanitizeString(item.detail) ?? // 新RESTトップレベル
+        sanitizeString(meta.work_detail) ?? // 互換
+        sanitizeString(item.content?.rendered) ?? // 次善
         null
     );
 };
@@ -226,16 +227,23 @@ const toWorkOverview = (item: any): WorkOverView => ({
 
 const toWorkDetail = (item: any): WorkDetail => {
     const meta = item.meta ?? {};
-    const stack = normalizeStringArray(meta.work_stack);
-    const links = normalizeStringArray(meta.work_links);
-    const youtube = normalizeStringArray(meta.work_youtube);
+    const stack = normalizeStringArray(item.stack ?? meta.work_stack);
+    const links = normalizeStringArray(item.links ?? meta.work_links);
+    const youtube = normalizeStringArray(item.youtube ?? meta.work_youtube);
     const images = normalizeImages(item);
 
     const thumbnail = getThumbnail(item);
 
     const yearValue = () => {
+        if (typeof item.year === "number") {
+            return item.year;
+        }
         if (typeof meta.work_year === "number") {
             return meta.work_year;
+        }
+        if (typeof item.year === "string") {
+            const parsed = parseInt(item.year, 10);
+            return Number.isNaN(parsed) ? null : parsed;
         }
         if (typeof meta.work_year === "string") {
             const parsed = parseInt(meta.work_year, 10);
@@ -247,13 +255,13 @@ const toWorkDetail = (item: any): WorkDetail => {
     return {
         ...toWorkOverview(item),
         detail: getDetail(item),
-        period: sanitizeString(meta.work_period),
-        role: sanitizeString(meta.work_role),
+        period: sanitizeString(item.period ?? meta.work_period),
+        role: sanitizeString(item.role ?? meta.work_role),
         year: yearValue(),
         stack,
         links,
         youtube,
-        featured: Boolean(meta.work_featured),
+        featured: typeof item.featured === "boolean" ? item.featured : Boolean(meta.work_featured),
         kind: sanitizeString(item.kind),
         images: images.length > 0 ? images : [],
         thumbnail,
