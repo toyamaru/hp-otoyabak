@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const env = process.env.ENV || "local";
+
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
@@ -11,12 +13,12 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "hp-otoyabak-local-ga0du58fv23gas9bueraga.s3.ap-northeast-1.amazonaws.com",
+        hostname: `hp-otoyabak-${env}-ga0du58fv23gas9bueraga.s3.ap-northeast-1.amazonaws.com`,
         pathname: "/**",
       },
       {
         protocol: "http",
-        hostname: "hp-otoyabak-local-ga0du58fv23gas9bueraga.s3.ap-northeast-1.amazonaws.com",
+        hostname: `hp-otoyabak-${env}-ga0du58fv23gas9bueraga.s3.ap-northeast-1.amazonaws.com`,
         pathname: "/**",
       },
     ],
