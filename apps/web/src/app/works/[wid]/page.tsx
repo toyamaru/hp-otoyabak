@@ -9,11 +9,19 @@ type WorkDetailPageProps = {
 
 const stripTags = (value: string) => value.replace(/<[^>]+>/g, "");
 
-const renderRichText = (html: string | null) => {
-    if (!html) {
+const renderRichText = (input: string | null) => {
+    if (!input) {
         return null;
     }
-    return <div className="text-sm leading-relaxed text-foreground" dangerouslySetInnerHTML={{ __html: html }} />;
+    const hasHtml = /<[^>]+>/.test(input);
+    if (hasHtml) {
+        return <div className="text-sm leading-relaxed text-foreground" dangerouslySetInnerHTML={{ __html: input }} />;
+    }
+    return (
+        <div className="text-sm leading-relaxed text-foreground" style={{ whiteSpace: "pre-line" }}>
+            {input}
+        </div>
+    );
 };
 
 export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
@@ -37,7 +45,9 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
                     <p className="text-xs uppercase tracking-[0.3em] text-foreground-sub">Work Detail</p>
                     <h1 className="text-3xl font-semibold md:text-4xl" dangerouslySetInnerHTML={{ __html: work.title }} />
                     {work.overview ? (
-                        <p className="text-sm text-foreground-sub md:text-base">{stripTags(work.overview)}</p>
+                        <p className="text-sm text-foreground-sub md:text-base" style={{ whiteSpace: "pre-line" }}>
+                            {stripTags(work.overview)}
+                        </p>
                     ) : (
                         <p className="text-sm text-foreground-sub">概要情報は準備中です。</p>
                     )}
