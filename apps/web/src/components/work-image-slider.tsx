@@ -72,9 +72,23 @@ export function WorkImageSlider({ images, title }: WorkImageSliderProps) {
             </div>
 
             {current.comment && (
-                <div className="rounded-2xl border border-accent/60 bg-surface/60 px-4 py-3 text-sm text-foreground">
-                    {current.comment}
-                </div>
+                (() => {
+                    const text = current.comment as string;
+                    const hasHtml = /<[^>]+>/.test(text);
+                    return hasHtml ? (
+                        <div
+                            className="rounded-2xl border border-accent/60 bg-surface/60 px-4 py-3 text-sm text-foreground"
+                            dangerouslySetInnerHTML={{ __html: text }}
+                        />
+                    ) : (
+                        <div
+                            className="rounded-2xl border border-accent/60 bg-surface/60 px-4 py-3 text-sm text-foreground"
+                            style={{ whiteSpace: "pre-line" }}
+                        >
+                            {text}
+                        </div>
+                    );
+                })()
             )}
 
             <div className="flex items-center justify-center gap-2">
