@@ -114,16 +114,33 @@ const fetchAllWorks = async () => {
 
 const fetchAllSkills = async () => {
     const skills_fetch_options = { next: { revalidate: 300, tags: ["skills"] } };
+    const per_page = 50;
     const buildSkillsUrl = (page: number) =>
-        `${WP}/wp/v2/skill`;
+        `${WP}/wp/v2/skill?per_page=${per_page}&page=${page}&status=publish&_embed=wp:featuredmedia`;
 
     const firstRes = await fetch(buildSkillsUrl(1), skills_fetch_options);
     if (!firstRes.ok) {
         throw new Error("Failed to fetch skills");
     }
+    const totalPages = Number(firstRes.headers.get("X-WP-TotalPages") ?? "1");
     const firstPageData = await firstRes.json();
 
-    return firstPageData;
+    if (totalPages <= 1) {
+        return firstPageData;
+    }
+
+    const restPages = await Promise.all(
+        Array.from({ length: totalPages - 1 }, (_, idx) => idx + 2).map((page) =>
+            fetch(buildSkillsUrl(page), skills_fetch_options).then((res) => {
+                if (!res.ok) {
+                    throw new Error(`Failed to fetch skills page ${page}`);
+                }
+                return res.json();
+            }),
+        ),
+    );
+
+    return [firstPageData, ...restPages].flat();
 };
 
 const sanitizeString = (value: unknown): string | null => {
@@ -284,16 +301,19 @@ const getSkillYears = (item: any): string | null => {
 };
 
 const getSkillThumbnail = (item: any): WorkThumbnail | null => {
+    const customImage = item.images?.[0]?.image;
     const embeddedMedia = item._embedded?.["wp:featuredmedia"]?.[0];
-    const url = embeddedMedia?.source_url ?? null;
 
-    if (!url) {
+    const thumbnailUrl = customImage?.url ?? embeddedMedia?.source_url ?? null;
+
+    if (!thumbnailUrl) {
         return null;
     }
 
     return {
-        url,
+        url: thumbnailUrl,
         alt:
+            customImage?.alt ??
             embeddedMedia?.alt_text ??
             embeddedMedia?.title?.rendered ??
             item.title?.rendered ??
