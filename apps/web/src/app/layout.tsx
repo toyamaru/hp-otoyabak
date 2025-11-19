@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { fetchGrobal } from "@/lib/wp";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Footer } from "@/components/footer";
@@ -28,6 +29,18 @@ export default async function RootLayout({
   return (
     <html lang="ja">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-JQFMENZWQB"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-JQFMENZWQB');
+          `}
+        </Script>
         <Header logoSrc={siteIconUrl ?? ""} siteTitle={siteTitle} />
         {children}
         <Footer logoSrc={siteIconUrl ?? ""} siteTitle={siteTitle} siteSubtitle={siteSubTitle} />
