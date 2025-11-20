@@ -26,16 +26,16 @@ const timeline = [
 
 const interests = [
     {
-        title: "Data × Product",
-        description: "データ活用を前提にしたプロダクト設計に関心があります。ダッシュボードや基盤だけでなく、そのデータが顧客価値に繋がる線を描くことを大切にしています。",
+        title: "データ基盤",
+        description: "データ基盤が好きです。色々組みたいです。",
     },
     {
-        title: "Small but Impactful",
-        description: "大掛かりな投資よりも、小さく作り早く試すアプローチが好きです。仮説検証サイクルを回しやすい仕組み作りを意識しています。",
+        title: "AI",
+        description: "AI系も好きです。でも統計などがまだ勉強できていないのでこれから勉強もしたい。",
     },
     {
-        title: "チームの土台づくり",
-        description: "ドキュメントやテンプレート、開発フローなど、チームが安心して開発できる土台を整えるのが得意です。得た知見はすぐに共有し、再現性を高めます。",
+        title: "アプリ開発",
+        description: "最近Typescriptをよく使っています。フロントからインフラまでかけて便利ですね。",
     },
 ];
 
@@ -49,6 +49,11 @@ const contactLinks = [
         label: "github",
         href: "https://github.com/toyamaru",
         description: "一緒にプログラミングをしましょう。",
+    },
+    {
+        label: "Qiita",
+        href: "https://qiita.com/toyamaru",
+        description: "頑張って更新します。",
     },
 ];
 
