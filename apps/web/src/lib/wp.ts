@@ -7,22 +7,62 @@ const WP = process.env.WORDPRESS_API_URL || "";
 
 export const fetchGrobal = cache(
     async (): Promise<{ metadata: Metadata; siteIconUrl: string | null; siteTitle: string | null; siteSubTitle: string | null }> => {
-    const defaultMetadata: Metadata = {
-        title: "デフォルト",
-        description: "デフォルト",
-        icons: {
-            icon: [
-                {
-                    url: "/favicon.ico",
-                    sizes: "32x32",
-                    type: "image/x-icon",
-                },
-            ],
-        },
-    };
-    try {
-        const res = await fetch(WP, { next: { revalidate: 3600 } });
-        if (!res.ok) {
+        const defaultMetadata: Metadata = {
+            title: "デフォルト",
+            description: "デフォルト",
+            icons: {
+                icon: [
+                    {
+                        url: "/favicon.ico",
+                        sizes: "32x32",
+                        type: "image/x-icon",
+                    },
+                ],
+            },
+        };
+        try {
+            const res = await fetch(WP, { next: { revalidate: 3600 } });
+            if (!res.ok) {
+                return {
+                    metadata: defaultMetadata,
+                    siteIconUrl: null,
+                    siteTitle: null,
+                    siteSubTitle: null,
+                };
+            }
+
+            const data: any = await res.json();
+            const siteName = data.name as string | undefined;
+            const siteDescription = data.description as string | undefined;
+            const siteSubTitle = data.description as string | undefined;
+            const siteIconUrlRaw = data.site_icon_url as string | undefined;
+            const siteUrl = (data.url || data.home) as string | undefined;
+
+            let siteIconUrl = siteIconUrlRaw;
+
+            const metadata: Metadata = {
+                title: siteName || defaultMetadata.title,
+                description: siteDescription || defaultMetadata.description,
+                icons: siteIconUrl
+                    ? {
+                        icon: [
+                            {
+                                url: siteIconUrl,
+                                sizes: "32x32",
+                                type: "image/png",
+                            },
+                        ],
+                    }
+                    : defaultMetadata.icons,
+            };
+
+            return {
+                metadata,
+                siteIconUrl: siteIconUrl ?? null,
+                siteTitle: siteName || null,
+                siteSubTitle: siteSubTitle || null,
+            };
+        } catch {
             return {
                 metadata: defaultMetadata,
                 siteIconUrl: null,
@@ -30,48 +70,7 @@ export const fetchGrobal = cache(
                 siteSubTitle: null,
             };
         }
-
-        const data: any = await res.json();
-        console.log(data);
-        const siteName = data.name as string | undefined;
-        const siteDescription = data.description as string | undefined;
-        const siteSubTitle = data.description as string | undefined;
-        const siteIconUrlRaw = data.site_icon_url as string | undefined;
-        const siteUrl = (data.url || data.home) as string | undefined;
-
-        let siteIconUrl = siteIconUrlRaw;
-
-        const metadata: Metadata = {
-            title: siteName || defaultMetadata.title,
-            description: siteDescription || defaultMetadata.description,
-            icons: siteIconUrl
-                ? {
-                    icon: [
-                        {
-                            url: siteIconUrl,
-                            sizes: "32x32",
-                            type: "image/png",
-                        },
-                    ],
-                }
-                : defaultMetadata.icons,
-        };
-
-        return {
-            metadata,
-            siteIconUrl: siteIconUrl ?? null,
-            siteTitle: siteName || null,
-            siteSubTitle: siteSubTitle || null,
-        };
-    } catch {
-        return {
-            metadata: defaultMetadata,
-            siteIconUrl: null,
-            siteTitle: null,
-            siteSubTitle: null,
-        };
-    }
-});
+    });
 
 export const getHomeData = cache(async () => {
     const [xxx] = await Promise.all([
@@ -332,7 +331,7 @@ const toSkill = (item: any): Skill => ({
 
 export const getWorksOverview = cache(async (): Promise<WorkOverView[]> => {
     const raw = await fetchAllWorks();
-    
+
     const works: WorkOverView[] = raw.map((item: any) => toWorkOverview(item));
 
     return works;
